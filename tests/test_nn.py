@@ -1051,6 +1051,10 @@ def test_layer_norm(getkey):
     x = jrandom.uniform(getkey(), (128,), dtype=jnp.bfloat16)
     assert ln(x).dtype == jnp.bfloat16
 
+    ln = eqx.nn.LayerNorm(8)
+    x = jrandom.normal(getkey(), (16, 8))
+    assert jax.vmap(ln)(x).shape == (16, 8)
+
 
 def test_group_norm(getkey):
     gn = eqx.nn.GroupNorm(groups=4, channels=128)
