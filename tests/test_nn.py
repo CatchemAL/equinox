@@ -1055,6 +1055,14 @@ def test_layer_norm(getkey):
     x = jrandom.normal(getkey(), (16, 8))
     assert jax.vmap(ln)(x).shape == (16, 8)
 
+    ln = eqx.nn.LayerNorm(shape=(4, 4), use_weight=False, use_bias=False)
+    x1 = jnp.linspace(0.1, 1, 16).reshape(4, 4)
+    x2 = jnp.linspace(0, 1, 16).reshape(4, 4)
+    x3 = (x1 - x1.mean()) / jnp.sqrt(x1.var() + 1e-5)
+
+    assert jnp.allclose(ln(x1), ln(x2), atol=1e-4)
+    assert jnp.allclose(ln(x1), x3, atol=1e-4)
+
 
 def test_group_norm(getkey):
     gn = eqx.nn.GroupNorm(groups=4, channels=128)
