@@ -146,11 +146,8 @@ class LayerNorm(Module):
             dtype = jnp.result_type(x.dtype, jnp.float32)
 
         x = x.astype(dtype)
-        mean = jnp.mean(x, keepdims=True)
-        variance = jnp.var(x, keepdims=True)
-        variance = jnp.maximum(0.0, variance)
-        inv = jax.lax.rsqrt(variance + self.eps)
-        out = (x - mean) * inv
+        axis = tuple(range(x.ndim))
+        out = jax.nn.standardize(x, axis=axis, epsilon=self.eps)
         if self.use_weight:
             out = self.weight.astype(dtype) * out  # pyright: ignore
         if self.use_bias:
